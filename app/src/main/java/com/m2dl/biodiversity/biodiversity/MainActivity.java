@@ -23,6 +23,7 @@ import java.io.File;
 public class MainActivity extends ActionBarActivity implements View.OnTouchListener {
 
     private static final int CAPTURE_IMAGE = 5654;
+    private static final int REQUEST_SEND_MAIL = 100;
 
     private Uri imageUri;
     private CustomImageView iv;
@@ -34,6 +35,15 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /*Handler mHand = new Handler();
+        final MainActivity var = this;
+        mHand.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(var, SenderActivity.class));
+            }
+        }, 5000);*/
 
         iv = (CustomImageView) findViewById(R.id.imageView);
 
