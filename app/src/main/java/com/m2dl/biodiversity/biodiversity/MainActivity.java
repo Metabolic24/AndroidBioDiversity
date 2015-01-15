@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -12,25 +13,31 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements View.OnTouchListener {
 
     private static final int CAPTURE_IMAGE = 5654;
 
     private Uri imageUri;
-    private ImageView iv;
+    private CustomImageView iv;
+    private RectF current = null;
+
+    private float srcX, srcY, destX, destY = -1f;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        iv = (ImageView) findViewById(R.id.imageView);
+        iv = (CustomImageView) findViewById(R.id.imageView);
+
+        iv.setOnTouchListener(this);
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -87,9 +94,78 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            showComment();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_CANCEL:
+                srcX = -1f;
+                srcY = -1f;
+                destX = -1f;
+                destY = -1f;
+                current = null;
+                break;
+            case MotionEvent.ACTION_DOWN:
+                srcX = event.getX();
+                srcY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (srcX != -1f && srcY != -1f) {
+                    if (current != null) {
+                        iv.removeRectangle(current);
+                    }
+
+                    destX = event.getX();
+                    destY = event.getY();
+                    current = new RectF(srcX, srcY, destX, destY);
+
+                    iv.addRectangle(current, false);
+                    iv.invalidate();
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if (current != null) {
+                    iv.removeRectangle(current);
+                }
+
+                if (destX != -1f && destY != -1f) {
+                    if (srcX == destX) {
+                        srcX = srcX - 5;
+                        destX = destX + 5;
+                    }
+
+                    if (srcY == destY) {
+                        srcY = srcY - 5;
+                        destY = destY + 5;
+                    }
+                    current = new RectF(srcX, srcY, destX, destY);
+                    destX = -1f;
+                    destY = -1f;
+                } else {
+                    current = new RectF(srcX - 5, srcY - 5, srcX + 5, srcY + 5);
+                }
+
+                iv.addRectangle(current, true);
+                iv.invalidate();
+
+                srcX = -1f;
+                srcY = -1f;
+                current = null;
+
+                break;
+        }
+
+        return true;
+    }
+
+    public void showComment() {
+        setContentView(R.layout.showcomment);
+
     }
 }
