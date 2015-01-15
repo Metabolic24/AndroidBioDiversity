@@ -1,5 +1,5 @@
 #IntelliJ Idea
-/.idea/
+/.idea
 .DS_Store
 
 # Built application files
@@ -28,3 +28,4 @@ proguard/
 
 # Log Files
 *.log
+*.iml
