@@ -15,6 +15,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -28,6 +31,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     private Uri imageUri;
     private CustomImageView iv;
     private RectF current = null;
+    private String comment = "";
 
     private float srcX, srcY, destX, destY = -1f;
 
@@ -103,7 +107,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.editer_commentaire) {
             showComment();
             return true;
         }
@@ -176,6 +180,29 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     public void showComment() {
         setContentView(R.layout.showcomment);
+
+        final EditText editText = (EditText)findViewById(R.id.editText);
+
+        if (!comment.isEmpty()) {
+            editText.setText(comment, TextView.BufferType.EDITABLE);
+        }
+
+        Button valider = (Button)findViewById(R.id.button);
+        valider.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                comment = editText.getText().toString();
+                setContentView(R.layout.activity_main);
+            }
+        });
+
+        Button annuler = (Button)findViewById(R.id.button);
+        annuler.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContentView(R.layout.activity_main);
+            }
+        });
 
     }
 }
