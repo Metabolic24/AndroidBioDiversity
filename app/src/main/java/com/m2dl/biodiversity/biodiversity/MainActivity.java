@@ -32,6 +32,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     private CustomImageView iv;
     private RectF current = null;
     private String comment = "";
+    private Bitmap bitmap = null;
 
     private float srcX, srcY, destX, destY = -1f;
 
@@ -66,7 +67,6 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Toast.makeText(this, imageUri.toString(), Toast.LENGTH_LONG).show();
 
         switch (requestCode) {
             //Si l'activité était une prise de photo
@@ -75,7 +75,6 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                     Uri selectedImage = imageUri;
                     getContentResolver().notifyChange(selectedImage, null);
                     ContentResolver cr = getContentResolver();
-                    Bitmap bitmap;
                     try {
                         bitmap = android.provider.MediaStore.Images.Media
                                 .getBitmap(cr, selectedImage);
@@ -193,6 +192,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             public void onClick(View v) {
                 comment = editText.getText().toString();
                 setContentView(R.layout.activity_main);
+                iv.setImageBitmap(bitmap);
             }
         });
 
@@ -201,6 +201,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             @Override
             public void onClick(View v) {
                 setContentView(R.layout.activity_main);
+                iv.setImageBitmap(bitmap);
             }
         });
 
