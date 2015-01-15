@@ -25,6 +25,10 @@
 
         </activity>
 
+        <activity
+            android:name=".KeySelectionActivity"
+            android:label="@string/title_activity_key_selection" >
+        </activity>
     </application>
 
 </manifest>
