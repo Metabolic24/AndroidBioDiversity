@@ -61,11 +61,9 @@ public class KeyXMLParser {
             String name = parser.getName();
             if (name.equals("id")) {
                 id = readId(parser);
-            }
-            else if (name.equals("soustype")) {
+            } else if (name.equals("soustype")) {
                 soustypes.add(readSousType(parser));
-            }
-            else {
+            } else {
                 skip(parser);
             }
         }
@@ -83,8 +81,7 @@ public class KeyXMLParser {
             String name = parser.getName();
             if (name.equals("id")) {
                 id = readId(parser);
-            }
-            else {
+            } else {
                 skip(parser);
             }
         }

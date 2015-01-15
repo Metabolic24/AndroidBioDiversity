@@ -1,19 +1,16 @@
 package com.m2dl.biodiversity.biodiversity;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +19,7 @@ import java.util.List;
 public class KeySelectionActivity extends ActionBarActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_key_selection);
 
@@ -31,8 +28,8 @@ public class KeySelectionActivity extends ActionBarActivity {
         try {
             final List<BioType> vals = parser.parse(this.getResources().openRawResource(R.raw.key));
 
-            List<String> spinnerArray =  new ArrayList<String>();
-            for(BioType bt : vals){
+            List<String> spinnerArray = new ArrayList<String>();
+            for (BioType bt : vals) {
                 spinnerArray.add(bt.id);
             }
 
@@ -46,10 +43,10 @@ public class KeySelectionActivity extends ActionBarActivity {
             sItems.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Spinner spinner = (Spinner)findViewById(R.id.spinner);
+                    Spinner spinner = (Spinner) findViewById(R.id.spinner);
                     String text = spinner.getSelectedItem().toString();
-                    for(BioType bt : vals){
-                        if(bt.id.equals(text)){
+                    for (BioType bt : vals) {
+                        if (bt.id.equals(text)) {
                             initSpinner2(bt.soustypes);
                         }
                     }
@@ -60,15 +57,13 @@ public class KeySelectionActivity extends ActionBarActivity {
 
                 }
             });
-        }
-        catch (XmlPullParserException x){
-        }
-        catch (IOException x2){
+        } catch (XmlPullParserException x) {
+        } catch (IOException x2) {
         }
 
     }
 
-    public void initSpinner2(List<String> soustypes){
+    public void initSpinner2(List<String> soustypes) {
         /*List<String> spinnerArray =  new ArrayList<String>();
         spinnerArray.add("test");
         spinnerArray.add("blabla");*/

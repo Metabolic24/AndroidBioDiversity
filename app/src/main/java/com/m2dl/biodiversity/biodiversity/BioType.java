@@ -2,9 +2,6 @@ package com.m2dl.biodiversity.biodiversity;
 
 import java.util.List;
 
-/**
- * Created by Hugo on 15/01/2015.
- */
 public class BioType {
 
     public String id;

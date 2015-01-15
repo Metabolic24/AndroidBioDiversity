@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed>
 
-<type>
-    <id>Plante</id>
-    <soustype>
-        <id>Grande</id>
-    </soustype>
-    <soustype>
-        <id>Petite</id>
-    </soustype>
-</type>
-<type>
-    <id>Animal</id>
-    <soustype>
-        <id>Vertebre</id>
-    </soustype>
-    <soustype>
-        <id>Invertebre</id>
-    </soustype>
-</type>
+    <type>
+        <id>Plante</id>
+        <soustype>
+            <id>Grande</id>
+        </soustype>
+        <soustype>
+            <id>Petite</id>
+        </soustype>
+    </type>
+    <type>
+        <id>Animal</id>
+        <soustype>
+            <id>Vertebre</id>
+        </soustype>
+        <soustype>
+            <id>Invertebre</id>
+        </soustype>
+    </type>
 </feed>

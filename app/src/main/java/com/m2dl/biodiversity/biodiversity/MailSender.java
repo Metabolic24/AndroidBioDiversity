@@ -1,15 +1,5 @@
 package com.m2dl.biodiversity.biodiversity;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
-
-import java.util.ArrayList;
-
-/**
- * Created by loic on 15/01/15.
- */
 public class MailSender implements ISender {
 
     @Override
