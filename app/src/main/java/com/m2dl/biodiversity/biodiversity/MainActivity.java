@@ -1,6 +1,5 @@
 package com.m2dl.biodiversity.biodiversity;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,6 +26,8 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     private static final int CAPTURE_IMAGE = 5654;
     private static final int REQUEST_SEND_MAIL = 100;
+    private static final int KEY_SELECTION = 303;
+
 
     private Uri imageUri;
     private CustomImageView iv;
@@ -71,7 +72,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         switch (requestCode) {
             //Si l'activité était une prise de photo
             case CAPTURE_IMAGE:
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageUri;
                     getContentResolver().notifyChange(selectedImage, null);
                     ContentResolver cr = getContentResolver();
@@ -87,6 +88,14 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                         Log.e("Camera", e.toString());
                     }
                 }
+                break;
+            case KEY_SELECTION:
+                if (resultCode == RESULT_OK) {
+                    iv.addRectangle(current, true);
+                    iv.invalidate();
+                    showComment(true);
+                }
+                current = null;
         }
 
     }
@@ -107,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.editer_commentaire) {
-            showComment();
+            showComment(false);
             return true;
         }
 
@@ -131,7 +140,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             case MotionEvent.ACTION_MOVE:
                 if (srcX != -1f && srcY != -1f) {
                     if (current != null) {
-                        iv.removeRectangle(current);
+                        iv.removeRectangle();
                     }
 
                     destX = event.getX();
@@ -144,7 +153,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                 break;
             case MotionEvent.ACTION_UP:
                 if (current != null) {
-                    iv.removeRectangle(current);
+                    iv.removeRectangle();
                 }
 
                 if (destX != -1f && destY != -1f) {
@@ -164,20 +173,23 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                     current = new RectF(srcX - 5, srcY - 5, srcX + 5, srcY + 5);
                 }
 
-                iv.addRectangle(current, true);
-                iv.invalidate();
-
                 srcX = -1f;
                 srcY = -1f;
-                current = null;
 
+                startActivityForResult(new Intent(this, KeySelectionActivity.class), KEY_SELECTION);
                 break;
         }
 
         return true;
     }
 
-    public void showComment() {
+    public void showComment(final boolean isKeySet) {
+        Button annuler = (Button) findViewById(R.id.button);
+
+        if (isKeySet) {
+            annuler.setText(getString(R.string.action_pass));
+        }
+
         setContentView(R.layout.showcomment);
 
         final EditText editText = (EditText)findViewById(R.id.editText);
@@ -186,22 +198,32 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             editText.setText(comment, TextView.BufferType.EDITABLE);
         }
 
+        final Intent nextIntent = new Intent(this, SenderActivity.class);
+
         Button valider = (Button)findViewById(R.id.button);
         valider.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 comment = editText.getText().toString();
-                setContentView(R.layout.activity_main);
-                iv.setImageBitmap(bitmap);
+                if (isKeySet) {
+                    startActivity(nextIntent);
+                } else {
+                    setContentView(R.layout.activity_main);
+                    iv.setImageBitmap(bitmap);
+                }
+
             }
         });
 
-        Button annuler = (Button)findViewById(R.id.button);
         annuler.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setContentView(R.layout.activity_main);
-                iv.setImageBitmap(bitmap);
+                if (isKeySet) {
+                    startActivity(nextIntent);
+                } else {
+                    setContentView(R.layout.activity_main);
+                    iv.setImageBitmap(bitmap);
+                }
             }
         });
 

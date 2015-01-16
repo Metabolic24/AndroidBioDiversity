@@ -5,10 +5,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_ok">Ok</string>
-    <string name="action_next">Next</string>
-    <string name="action_cancel">Cancel</string>
-    <string name="action_pass">Pass</string>
-    <string name="action_key_selection_title">Add a type</string>
+    <string name="action_next">Suivant</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_pass">Passer</string>
+    <string name="action_key_selection_title">Sélectionner un type</string>
     <string name="title_activity_key_selection">KeySelectionActivity</string>
 
 </resources>

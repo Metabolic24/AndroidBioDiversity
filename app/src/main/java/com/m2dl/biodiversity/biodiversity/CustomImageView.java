@@ -55,8 +55,11 @@ public class CustomImageView extends ImageView {
         }
     }
 
-    public void removeRectangle(RectF rectangle) {
-        rectList.remove(rectangle);
+    public void removeRectangle() {
+        if (current != null) {
+            rectList.remove(current);
+            current = null;
+        }
     }
 
     @Override

@@ -23,7 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/textView" />
+        android:layout_below="@+id/textView"
+        android:gravity="center_horizontal" />
 
     <Spinner
         android:id="@+id/spinner2"
