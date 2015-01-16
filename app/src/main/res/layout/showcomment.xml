@@ -3,40 +3,57 @@
     android:id="@+id/linearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:gravity="center_vertical|center_horizontal"
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Commentaire" />
+        android:paddingBottom="10dp"
+        android:text="Commentaire"
+        android:textSize="22dp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
+        android:layout_width="294dp"
+        android:layout_height="47dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.11"
+        android:background="@drawable/edittext"
+        android:linksClickable="true"
+        android:padding="3dp" />
 
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:orientation="horizontal">
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
-        <Button
+    <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:gravity="center_vertical|center_horizontal"
             android:text="Valider" />
 
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="85dp"
+            android:layout_weight="0.24" />
         <Button
             android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="center"
+            android:gravity="center_vertical|center_horizontal"
             android:text="Annuler" />
     </LinearLayout>
 

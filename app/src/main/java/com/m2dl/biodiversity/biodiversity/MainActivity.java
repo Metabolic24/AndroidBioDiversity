@@ -1,7 +1,8 @@
 package com.m2dl.biodiversity.biodiversity;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
@@ -15,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,11 +27,14 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     private static final int CAPTURE_IMAGE = 5654;
     private static final int REQUEST_SEND_MAIL = 100;
+    private static final int KEY_SELECTION = 303;
+
 
     private Uri imageUri;
     private CustomImageView iv;
     private RectF current = null;
     private String comment = "";
+    private Bitmap bitmap = null;
 
     private float srcX, srcY, destX, destY = -1f;
 
@@ -58,16 +61,14 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Toast.makeText(this, imageUri.toString(), Toast.LENGTH_LONG).show();
 
         switch (requestCode) {
             //Si l'activité était une prise de photo
             case CAPTURE_IMAGE:
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageUri;
                     getContentResolver().notifyChange(selectedImage, null);
                     ContentResolver cr = getContentResolver();
-                    Bitmap bitmap;
                     try {
                         bitmap = android.provider.MediaStore.Images.Media
                                 .getBitmap(cr, selectedImage);
@@ -80,6 +81,14 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                         Log.e("Camera", e.toString());
                     }
                 }
+                break;
+            case KEY_SELECTION:
+                if (resultCode == RESULT_OK) {
+                    iv.addRectangle(current, true);
+                    iv.invalidate();
+                    showComment(true);
+                }
+                current = null;
         }
 
     }
@@ -100,7 +109,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.editer_commentaire) {
-            showComment();
+            showComment(false);
             return true;
         }
 
@@ -124,7 +133,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             case MotionEvent.ACTION_MOVE:
                 if (srcX != -1f && srcY != -1f) {
                     if (current != null) {
-                        iv.removeRectangle(current);
+                        iv.removeRectangle();
                     }
 
                     destX = event.getX();
@@ -137,7 +146,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                 break;
             case MotionEvent.ACTION_UP:
                 if (current != null) {
-                    iv.removeRectangle(current);
+                    iv.removeRectangle();
                 }
 
                 if (destX != -1f && destY != -1f) {
@@ -157,44 +166,59 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                     current = new RectF(srcX - 5, srcY - 5, srcX + 5, srcY + 5);
                 }
 
-                iv.addRectangle(current, true);
-                iv.invalidate();
-
                 srcX = -1f;
                 srcY = -1f;
-                current = null;
 
+                Intent nextIntent = new Intent(this, KeySelectionActivity.class);
+                startActivityForResult(nextIntent, KEY_SELECTION);
                 break;
         }
 
         return true;
     }
 
-    public void showComment() {
-        setContentView(R.layout.showcomment);
+    public void showComment(final boolean isKeySet) {
+        String negButtonTitle = isKeySet ?
+                getString(R.string.action_pass) :
+                getString(R.string.action_cancel);
 
-        final EditText editText = (EditText)findViewById(R.id.editText);
+        String posButtonTitle = isKeySet ?
+                getString(R.string.action_next) :
+                getString(R.string.action_ok);
 
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle("Commentaire");
+        alert.setMessage("Editer le commentaire");
+
+        // Set an EditText view to get user input
+        final EditText input = new EditText(this);
         if (!comment.isEmpty()) {
-            editText.setText(comment, TextView.BufferType.EDITABLE);
+            input.setText(comment, TextView.BufferType.EDITABLE);
         }
 
-        Button valider = (Button)findViewById(R.id.button);
-        valider.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                comment = editText.getText().toString();
-                setContentView(R.layout.activity_main);
+        alert.setView(input);
+
+        final Intent nextIntent = new Intent(this, SenderActivity.class);
+
+        alert.setPositiveButton(posButtonTitle, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                comment = input.getText().toString();
+
+                if (isKeySet) {
+                    startActivity(nextIntent);
+                }
             }
         });
 
-        Button annuler = (Button)findViewById(R.id.button);
-        annuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setContentView(R.layout.activity_main);
+        alert.setNegativeButton(negButtonTitle, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (isKeySet) {
+                    startActivity(nextIntent);
+                }
             }
         });
 
+        alert.show();
     }
 }

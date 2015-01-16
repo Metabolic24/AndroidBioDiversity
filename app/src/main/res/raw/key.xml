@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed>
-
     <type>
         <id>Plante</id>
         <soustype>
@@ -13,10 +12,10 @@
     <type>
         <id>Animal</id>
         <soustype>
-            <id>Vertebre</id>
+            <id>Vertébré</id>
         </soustype>
         <soustype>
-            <id>Invertebre</id>
+            <id>Invertébré</id>
         </soustype>
     </type>
 </feed>

@@ -1,12 +1,11 @@
 package com.m2dl.biodiversity.biodiversity;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class KeySelectionActivity extends ActionBarActivity {
+public class KeySelectionActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +27,12 @@ public class KeySelectionActivity extends ActionBarActivity {
         try {
             final List<BioType> vals = parser.parse(this.getResources().openRawResource(R.raw.key));
 
-            List<String> spinnerArray = new ArrayList<String>();
+            List<String> spinnerArray = new ArrayList<>();
             for (BioType bt : vals) {
                 spinnerArray.add(bt.id);
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     this, android.R.layout.simple_spinner_item, spinnerArray);
 
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -57,43 +56,52 @@ public class KeySelectionActivity extends ActionBarActivity {
 
                 }
             });
-        } catch (XmlPullParserException x) {
-        } catch (IOException x2) {
+        } catch (XmlPullParserException | IOException x) {
         }
 
+        Button nextButton = (Button) findViewById(R.id.button_next);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO Ajouter la mémorisation du choix (si besoin)
+                stop(RESULT_OK);
+            }
+        });
+
+        Button passButton = (Button) findViewById(R.id.button_pass);
+        passButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stop(RESULT_OK);
+            }
+        });
+
+        Button cancelButton = (Button) findViewById(R.id.button_cancel);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stop(RESULT_CANCELED);
+            }
+        });
+
     }
+
+    public void stop(int resultCode) {
+        this.setVisible(false);
+        setResult(resultCode);
+        finish();
+    }
+
 
     public void initSpinner2(List<String> soustypes) {
         /*List<String> spinnerArray =  new ArrayList<String>();
         spinnerArray.add("test");
         spinnerArray.add("blabla");*/
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, soustypes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, soustypes);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner sItems = (Spinner) findViewById(R.id.spinner2);
         sItems.setAdapter(adapter);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_key_selection, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
