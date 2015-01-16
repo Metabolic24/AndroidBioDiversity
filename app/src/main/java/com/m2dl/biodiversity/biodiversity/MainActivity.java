@@ -39,15 +39,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /*Handler mHand = new Handler();
-        final MainActivity var = this;
-        mHand.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startActivity(new Intent(var, SenderActivity.class));
-            }
-        }, 5000);*/
+        startActivity(new Intent(this, SenderActivity.class));
 
         iv = (CustomImageView) findViewById(R.id.imageView);
 

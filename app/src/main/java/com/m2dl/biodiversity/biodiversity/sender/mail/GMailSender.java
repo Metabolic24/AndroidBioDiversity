@@ -1,4 +1,4 @@
-package com.m2dl.biodiversity.biodiversity;
+package com.m2dl.biodiversity.biodiversity.sender.mail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
