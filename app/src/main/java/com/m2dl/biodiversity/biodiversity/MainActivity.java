@@ -1,6 +1,8 @@
 package com.m2dl.biodiversity.biodiversity;
 
+import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
@@ -14,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -185,29 +186,32 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void showComment(final boolean isKeySet) {
-        setContentView(R.layout.showcomment);
+        String negButtonTitle = isKeySet ?
+                getString(R.string.action_pass) :
+                getString(R.string.action_cancel);
 
-        Button annuler = (Button) findViewById(R.id.button2);
+        String posButtonTitle = isKeySet ?
+                getString(R.string.action_next) :
+                getString(R.string.action_ok);
 
-        if (isKeySet) {
-            annuler.setText(getString(R.string.action_pass));
-        }
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        final EditText editText = (EditText)findViewById(R.id.editText);
+        alert.setTitle("Commentaire");
+        alert.setMessage("Editer le commentaire");
 
+        // Set an EditText view to get user input
+        final EditText input = new EditText(this);
         if (!comment.isEmpty()) {
-            editText.setText(comment, TextView.BufferType.EDITABLE);
+            input.setText(comment, TextView.BufferType.EDITABLE);
         }
+
+        alert.setView(input);
 
         final Intent nextIntent = new Intent(this, SenderActivity.class);
 
-        Button valider = (Button)findViewById(R.id.button);
-        valider.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                comment = editText.getText().toString();
-                setContentView(R.layout.activity_main);
-                iv.setImageBitmap(bitmap);
+        alert.setPositiveButton(posButtonTitle, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                comment = input.getText().toString();
 
                 if (isKeySet) {
                     startActivity(nextIntent);
@@ -215,17 +219,14 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             }
         });
 
-        annuler.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        alert.setNegativeButton(negButtonTitle, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
                 if (isKeySet) {
                     startActivity(nextIntent);
-                } else {
-                    setContentView(R.layout.activity_main);
-                    iv.setImageBitmap(bitmap);
                 }
             }
         });
 
+        alert.show();
     }
 }
