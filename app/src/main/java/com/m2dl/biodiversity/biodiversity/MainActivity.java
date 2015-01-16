@@ -1,6 +1,8 @@
 package com.m2dl.biodiversity.biodiversity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,7 +26,7 @@ import android.widget.Toast;
 import java.io.File;
 
 
-public class MainActivity extends ActionBarActivity implements View.OnTouchListener {
+public class MainActivity extends ActionBarActivity implements View.OnTouchListener, LoginDialog.NoticeDialogListener {
 
     private static final int CAPTURE_IMAGE = 5654;
     private static final int REQUEST_SEND_MAIL = 100;
@@ -36,12 +39,20 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     private String comment = "";
     private Bitmap bitmap = null;
 
+    private LoginDialog loginDialog;
+
     private float srcX, srcY, destX, destY = -1f;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        showLoginDialog();
+
+
+/*
+
         startActivity(new Intent(this, SenderActivity.class));
 
         iv = (CustomImageView) findViewById(R.id.imageView);
@@ -57,7 +68,15 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
         startActivityForResult(intent, CAPTURE_IMAGE);
+        */
     }
+
+    public void showLoginDialog() {
+        // Create an instance of the dialog fragment and show it
+        loginDialog = new LoginDialog();
+        loginDialog.show(getFragmentManager(), "LoginDialog");
+    }
+
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -220,5 +239,16 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         });
 
         alert.show();
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Log.i("Login", loginDialog.getLoginChosen());
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
     }
 }
