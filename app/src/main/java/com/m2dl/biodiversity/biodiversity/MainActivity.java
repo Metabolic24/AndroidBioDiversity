@@ -176,7 +176,8 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                 srcX = -1f;
                 srcY = -1f;
 
-                startActivityForResult(new Intent(this, KeySelectionActivity.class), KEY_SELECTION);
+                Intent nextIntent = new Intent(this, KeySelectionActivity.class);
+                startActivityForResult(nextIntent, KEY_SELECTION);
                 break;
         }
 
@@ -184,13 +185,13 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     }
 
     public void showComment(final boolean isKeySet) {
-        Button annuler = (Button) findViewById(R.id.button);
+        setContentView(R.layout.showcomment);
+
+        Button annuler = (Button) findViewById(R.id.button2);
 
         if (isKeySet) {
             annuler.setText(getString(R.string.action_pass));
         }
-
-        setContentView(R.layout.showcomment);
 
         final EditText editText = (EditText)findViewById(R.id.editText);
 
@@ -205,13 +206,12 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             @Override
             public void onClick(View v) {
                 comment = editText.getText().toString();
+                setContentView(R.layout.activity_main);
+                iv.setImageBitmap(bitmap);
+
                 if (isKeySet) {
                     startActivity(nextIntent);
-                } else {
-                    setContentView(R.layout.activity_main);
-                    iv.setImageBitmap(bitmap);
                 }
-
             }
         });
 

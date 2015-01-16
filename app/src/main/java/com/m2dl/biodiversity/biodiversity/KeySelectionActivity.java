@@ -27,12 +27,12 @@ public class KeySelectionActivity extends Activity {
         try {
             final List<BioType> vals = parser.parse(this.getResources().openRawResource(R.raw.key));
 
-            List<String> spinnerArray = new ArrayList<String>();
+            List<String> spinnerArray = new ArrayList<>();
             for (BioType bt : vals) {
                 spinnerArray.add(bt.id);
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     this, android.R.layout.simple_spinner_item, spinnerArray);
 
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -56,26 +56,23 @@ public class KeySelectionActivity extends Activity {
 
                 }
             });
-        } catch (XmlPullParserException x) {
-        } catch (IOException x2) {
+        } catch (XmlPullParserException | IOException x) {
         }
 
         Button nextButton = (Button) findViewById(R.id.button_next);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(RESULT_OK);
                 //TODO Ajouter la mémorisation du choix (si besoin)
-                onStop();
+                stop(RESULT_OK);
             }
         });
 
         Button passButton = (Button) findViewById(R.id.button_pass);
-        nextButton.setOnClickListener(new View.OnClickListener() {
+        passButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(RESULT_OK);
-                onStop();
+                stop(RESULT_OK);
             }
         });
 
@@ -83,19 +80,25 @@ public class KeySelectionActivity extends Activity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(RESULT_CANCELED);
-                onStop();
+                stop(RESULT_CANCELED);
             }
         });
 
     }
+
+    public void stop(int resultCode) {
+        this.setVisible(false);
+        setResult(resultCode);
+        finish();
+    }
+
 
     public void initSpinner2(List<String> soustypes) {
         /*List<String> spinnerArray =  new ArrayList<String>();
         spinnerArray.add("test");
         spinnerArray.add("blabla");*/
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, soustypes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, soustypes);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner sItems = (Spinner) findViewById(R.id.spinner2);
