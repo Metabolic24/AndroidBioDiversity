@@ -27,12 +27,12 @@ public class KeySelectionActivity extends Activity {
         try {
             final List<BioType> vals = parser.parse(this.getResources().openRawResource(R.raw.key));
 
-            List<String> spinnerArray = new ArrayList<>();
+            List<String> spinnerArray = new ArrayList<String>();
             for (BioType bt : vals) {
                 spinnerArray.add(bt.id);
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                     this, android.R.layout.simple_spinner_item, spinnerArray);
 
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -56,7 +56,9 @@ public class KeySelectionActivity extends Activity {
 
                 }
             });
-        } catch (XmlPullParserException | IOException x) {
+        } catch (XmlPullParserException ex) {
+
+        } catch (IOException x) {
         }
 
         Button nextButton = (Button) findViewById(R.id.button_next);
@@ -98,7 +100,7 @@ public class KeySelectionActivity extends Activity {
         spinnerArray.add("test");
         spinnerArray.add("blabla");*/
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, soustypes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, soustypes);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner sItems = (Spinner) findViewById(R.id.spinner2);

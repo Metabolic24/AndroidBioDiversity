@@ -10,9 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-/**
- * Created by loic on 16/01/15.
- */
 public class LoginDialog extends DialogFragment {
 
 
@@ -50,16 +47,19 @@ public class LoginDialog extends DialogFragment {
         final EditText txtLogin = (EditText) content.findViewById(R.id.txtLogin);
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
+        //setStyle(STYLE_NORMAL,getTheme());
         builder.setView(content)
                 // Add action buttons
-                .setPositiveButton("Login", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.action_login), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         loginChosen = txtLogin.getText().toString();
-                        mListener.onDialogPositiveClick(LoginDialog.this);
+                        if(!loginChosen.isEmpty()) {
+                            mListener.onDialogPositiveClick(LoginDialog.this);
+                        }
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getString(R.string.action_quit), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mListener.onDialogNegativeClick(LoginDialog.this);
                     }

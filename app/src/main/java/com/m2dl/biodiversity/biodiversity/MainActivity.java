@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     private RectF current = null;
     private String comment = "";
     private Bitmap bitmap = null;
+    private String login = "";
 
     private LoginDialog loginDialog;
 
@@ -49,26 +50,6 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         setContentView(R.layout.activity_main);
 
         showLoginDialog();
-
-
-/*
-
-        startActivity(new Intent(this, SenderActivity.class));
-
-        iv = (CustomImageView) findViewById(R.id.imageView);
-
-        iv.setOnTouchListener(this);
-
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
-
-        imageUri = Uri.fromFile(photo);
-
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-
-        startActivityForResult(intent, CAPTURE_IMAGE);
-        */
     }
 
     public void showLoginDialog() {
@@ -243,12 +224,24 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
-        Log.i("Login", loginDialog.getLoginChosen());
+        login = loginDialog.getLoginChosen();
+        iv = (CustomImageView) findViewById(R.id.imageView);
 
+        iv.setOnTouchListener(this);
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
+
+        imageUri = Uri.fromFile(photo);
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+        startActivityForResult(intent, CAPTURE_IMAGE);
     }
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
-
+        System.exit(RESULT_OK);
     }
 }

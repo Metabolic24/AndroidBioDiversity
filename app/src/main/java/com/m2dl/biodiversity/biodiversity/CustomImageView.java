@@ -34,7 +34,7 @@ public class CustomImageView extends ImageView {
     }
 
     private void init() {
-        rectList = new ArrayList<>();
+        rectList = new ArrayList<RectF>();
         finalPaint = new Paint();
         finalPaint.setColor(Color.RED);
         finalPaint.setStyle(Paint.Style.STROKE);
