@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -30,16 +29,18 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     private CustomImageView iv;
     private RectF current = null;
-    private String comment = "";
     private Bitmap bitmap = null;
-    private String login = "";
-    private Location location;
+    private float srcX, srcY, destX, destY = -1f;
+
+    private UserInformation userInfo;
 
     private SharedPreferences settings;
-
     private LoginDialog loginDialog;
 
-    private float srcX, srcY, destX, destY = -1f;
+    public MainActivity() {
+        super();
+        userInfo = new UserInformation();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,13 +48,13 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         setContentView(R.layout.activity_main);
         settings = getSharedPreferences("PREFS_BIODIVERSITY",0);
 
-        showLoginDialog();
+        showLoginDialog(false);
     }
 
-    public void showLoginDialog() {
+    public void showLoginDialog(boolean force) {
         // Create an instance of the dialog fragment and show it
-        login = settings.getString("login", null);
-        if(login == null) {
+        userInfo.setLogin(settings.getString("login", null));
+        if(userInfo.getLogin() == null || force) {
             loginDialog = new LoginDialog();
             loginDialog.show(getFragmentManager(), "LoginDialog");
         }
@@ -92,15 +93,10 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
                     LocationManager lm = (LocationManager) this.getSystemService(LOCATION_SERVICE);
                     if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        userInfo.setLocation(lm.getLastKnownLocation(LocationManager.GPS_PROVIDER));
                     }
                     else {
-                        location = null;
-                    }
-                    //DEBUG
-                    if(location != null)
-                    {
-                        Log.i("Location", location.toString());
+                        userInfo.setLocation(null);
                     }
                 }
                 break;
@@ -130,6 +126,12 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         if (id == R.id.editer_commentaire) {
             showComment(false);
             return true;
+        }
+        else {
+            if(id == R.id.change_login) {
+                showLoginDialog(true);
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -212,8 +214,8 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
         // Set an EditText view to get user input
         final EditText input = new EditText(this);
-        if (!comment.isEmpty()) {
-            input.setText(comment, TextView.BufferType.EDITABLE);
+        if (!userInfo.getComment().isEmpty()) {
+            input.setText(userInfo.getComment(), TextView.BufferType.EDITABLE);
         }
 
         alert.setView(input);
@@ -222,7 +224,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
         alert.setPositiveButton(posButtonTitle, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                comment = input.getText().toString();
+                userInfo.setComment(input.getText().toString());
 
                 if (isKeySet) {
                     startActivity(nextIntent);
@@ -243,10 +245,10 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
-        login = loginDialog.getLoginChosen();
+        userInfo.setLogin(loginDialog.getLoginChosen());
 
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("login", login);
+        editor.putString("login", userInfo.getLogin());
         editor.commit();
 
         startPhoto();
