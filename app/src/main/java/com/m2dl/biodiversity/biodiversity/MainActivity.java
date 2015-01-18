@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.net.Uri;
@@ -40,6 +41,8 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     private Bitmap bitmap = null;
     private String login = "";
 
+    private SharedPreferences settings;
+
     private LoginDialog loginDialog;
 
     private float srcX, srcY, destX, destY = -1f;
@@ -48,14 +51,31 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        settings = getSharedPreferences("PREFS_BIODIVERSITY",0);
 
         showLoginDialog();
     }
 
     public void showLoginDialog() {
         // Create an instance of the dialog fragment and show it
-        loginDialog = new LoginDialog();
-        loginDialog.show(getFragmentManager(), "LoginDialog");
+        login = settings.getString("login", null);
+        if(login == null) {
+            loginDialog = new LoginDialog();
+            loginDialog.show(getFragmentManager(), "LoginDialog");
+        }
+        else {
+            startPhoto();
+        }
+    }
+
+    public void startPhoto() {
+        iv = (CustomImageView) findViewById(R.id.imageView);
+        iv.setOnTouchListener(this);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
+        imageUri = Uri.fromFile(photo);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        startActivityForResult(intent, CAPTURE_IMAGE);
     }
 
 
@@ -225,19 +245,11 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
         login = loginDialog.getLoginChosen();
-        iv = (CustomImageView) findViewById(R.id.imageView);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("login", login);
+        editor.commit();
 
-        iv.setOnTouchListener(this);
-
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
-
-        imageUri = Uri.fromFile(photo);
-
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-
-        startActivityForResult(intent, CAPTURE_IMAGE);
+        startPhoto();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.m2dl.biodiversity.biodiversity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -28,6 +29,7 @@ public class SenderActivity extends ActionBarActivity {
                     }
                 });
                 t.start();
+                SenderActivity.this.startActivity(new Intent(SenderActivity.this, MainActivity.class));
             }
         });
 
