@@ -13,14 +13,8 @@ import android.widget.EditText;
 public class LoginDialog extends DialogFragment {
 
 
-    public interface NoticeDialogListener {
-        public void onDialogPositiveClick(DialogFragment dialog);
-        public void onDialogNegativeClick(DialogFragment dialog);
-    }
-
     // Use this instance of the interface to deliver action events
     private NoticeDialogListener mListener;
-
     private String loginChosen;
 
     // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
@@ -48,14 +42,15 @@ public class LoginDialog extends DialogFragment {
         final EditText txtLogin = (EditText) content.findViewById(R.id.txtLogin);
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
-        //setStyle(STYLE_NORMAL,getTheme());
+        setStyle(STYLE_NORMAL, getTheme());
+        setCancelable(false);
         builder.setView(content)
                 // Add action buttons
                 .setPositiveButton(getString(R.string.action_login), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         loginChosen = txtLogin.getText().toString();
-                        if(!loginChosen.isEmpty()) {
+                        if (!loginChosen.isEmpty()) {
                             mListener.onDialogPositiveClick(LoginDialog.this);
                         }
                     }
@@ -70,5 +65,11 @@ public class LoginDialog extends DialogFragment {
 
     public String getLoginChosen() {
         return loginChosen;
+    }
+
+    public interface NoticeDialogListener {
+        public void onDialogPositiveClick(DialogFragment dialog);
+
+        public void onDialogNegativeClick(DialogFragment dialog);
     }
 }

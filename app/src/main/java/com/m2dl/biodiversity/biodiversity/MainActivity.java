@@ -1,7 +1,6 @@
 package com.m2dl.biodiversity.biodiversity;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -9,13 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -24,8 +20,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-
 
 public class MainActivity extends ActionBarActivity implements View.OnTouchListener, LoginDialog.NoticeDialogListener {
 
@@ -33,8 +27,6 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     private static final int REQUEST_SEND_MAIL = 100;
     private static final int KEY_SELECTION = 303;
 
-
-    private Uri imageUri;
     private CustomImageView iv;
     private RectF current = null;
     private String comment = "";
@@ -86,13 +78,12 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             //Si l'activité était une prise de photo
             case CAPTURE_IMAGE:
                 if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageUri;
-                    getContentResolver().notifyChange(selectedImage, null);
+                    /*Uri selectedImage = imageUri;
+                    getContentResolver().notifyChange(selectedImage, null);*/
                     ContentResolver cr = getContentResolver();
                     try {
                         bitmap = android.provider.MediaStore.Images.Media
-                                .getBitmap(cr, selectedImage);
-
+                                .getBitmap(cr, data.getData());
                         iv.setImageBitmap(bitmap);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -109,22 +100,19 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                     showComment(true);
                 }
                 current = null;
+                break;
         }
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -245,11 +233,21 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
         login = loginDialog.getLoginChosen();
+<<<<<<< HEAD
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("login", login);
         editor.commit();
 
         startPhoto();
+=======
+        iv = (CustomImageView) findViewById(R.id.imageView);
+
+        iv.setOnTouchListener(this);
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        startActivityForResult(intent, CAPTURE_IMAGE);
+>>>>>>> da077fa1c6091ccd9c0d56b53e208777462c32a5
     }
 
     @Override
