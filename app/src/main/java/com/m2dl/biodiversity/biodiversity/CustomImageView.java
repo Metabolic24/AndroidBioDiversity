@@ -34,14 +34,15 @@ public class CustomImageView extends ImageView {
     }
 
     private void init() {
-        rectList = new ArrayList<RectF>();
+        rectList = new ArrayList<>();
         finalPaint = new Paint();
         finalPaint.setColor(Color.RED);
         finalPaint.setStyle(Paint.Style.STROKE);
         finalPaint.setStrokeWidth(3);
 
         drawingPaint = new Paint();
-        drawingPaint.setColor(Color.GRAY);
+        //drawingPaint.setColor(Color.GRAY); //Commenté si un seul élément
+        drawingPaint.setColor(Color.RED);
         drawingPaint.setStyle(Paint.Style.STROKE);
         drawingPaint.setStrokeWidth(3);
     }
