@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -24,7 +26,6 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity implements View.OnTouchListener, LoginDialog.NoticeDialogListener {
 
     private static final int CAPTURE_IMAGE = 5654;
-    private static final int REQUEST_SEND_MAIL = 100;
     private static final int KEY_SELECTION = 303;
 
     private CustomImageView iv;
@@ -32,6 +33,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     private String comment = "";
     private Bitmap bitmap = null;
     private String login = "";
+    private Location location;
 
     private SharedPreferences settings;
 
@@ -64,12 +66,8 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         iv = (CustomImageView) findViewById(R.id.imageView);
         iv.setOnTouchListener(this);
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
-        imageUri = Uri.fromFile(photo);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(intent, CAPTURE_IMAGE);
     }
-
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -90,6 +88,19 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                         Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT)
                                 .show();
                         Log.e("Camera", e.toString());
+                    }
+
+                    LocationManager lm = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+                    if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
+                    else {
+                        location = null;
+                    }
+                    //DEBUG
+                    if(location != null)
+                    {
+                        Log.i("Location", location.toString());
                     }
                 }
                 break;
@@ -233,21 +244,12 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
         login = loginDialog.getLoginChosen();
-<<<<<<< HEAD
+
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("login", login);
         editor.commit();
 
         startPhoto();
-=======
-        iv = (CustomImageView) findViewById(R.id.imageView);
-
-        iv.setOnTouchListener(this);
-
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        startActivityForResult(intent, CAPTURE_IMAGE);
->>>>>>> da077fa1c6091ccd9c0d56b53e208777462c32a5
     }
 
     @Override
