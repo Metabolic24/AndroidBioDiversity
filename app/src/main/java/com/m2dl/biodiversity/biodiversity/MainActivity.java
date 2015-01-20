@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.RectF;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,27 +14,26 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/*Activité Principale de l'Application*/
 
-public class MainActivity extends ActionBarActivity implements View.OnTouchListener, LoginDialog.NoticeDialogListener {
+public class MainActivity extends ActionBarActivity implements CustomImageView.KeyLauncher, LoginDialog.NoticeDialogListener {
 
     private static final int CAPTURE_IMAGE = 5654;
     private static final int KEY_SELECTION = 303;
 
     private CustomImageView iv;
-    private RectF current = null;
     private Bitmap bitmap = null;
-    private float srcX, srcY, destX, destY = -1f;
 
     private UserInformation userInfo;
 
     private SharedPreferences settings;
     private LoginDialog loginDialog;
+
+    //Constructeur
 
     public MainActivity() {
         super();
@@ -46,35 +44,19 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         settings = getSharedPreferences("PREFS_BIODIVERSITY",0);
 
         showLoginDialog(false);
     }
 
-    public void showLoginDialog(boolean force) {
-        // Create an instance of the dialog fragment and show it
-        userInfo.setLogin(settings.getString("login", null));
-        if(userInfo.getLogin() == null || force) {
-            loginDialog = new LoginDialog();
-            loginDialog.show(getFragmentManager(), "LoginDialog");
-        }
-        else {
-            startPhoto();
-        }
-    }
-
-    public void startPhoto() {
-        iv = (CustomImageView) findViewById(R.id.imageView);
-        iv.setOnTouchListener(this);
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, CAPTURE_IMAGE);
-    }
+    /* Effectue un traitement après la fin d'une activité : */
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            //Si l'activité était une prise de photo
+            //Photo
             case CAPTURE_IMAGE:
                 if (resultCode == RESULT_OK) {
                     /*Uri selectedImage = imageUri;
@@ -98,19 +80,27 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                     else {
                         userInfo.setLocation(null);
                     }
+                } else {
+                    System.exit(RESULT_CANCELED);
                 }
                 break;
+            //Clé de détermination
             case KEY_SELECTION:
+                iv.finalize(resultCode == RESULT_OK);
                 if (resultCode == RESULT_OK) {
-                    iv.addRectangle(current, true);
-                    iv.invalidate();
                     showComment(true);
                 }
-                current = null;
                 break;
         }
 
     }
+
+
+    /************/
+    /****MENU****/
+    /**
+     * ********
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -137,66 +127,71 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_CANCEL:
-                srcX = -1f;
-                srcY = -1f;
-                destX = -1f;
-                destY = -1f;
-                current = null;
-                break;
-            case MotionEvent.ACTION_DOWN:
-                srcX = event.getX();
-                srcY = event.getY();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (srcX != -1f && srcY != -1f) {
-                    if (current != null) {
-                        iv.removeRectangle();
-                    }
 
-                    destX = event.getX();
-                    destY = event.getY();
-                    current = new RectF(srcX, srcY, destX, destY);
+    /*************/
+    /****LOGIN****/
+    /**
+     * *********
+     */
 
-                    iv.addRectangle(current, false);
-                    iv.invalidate();
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if (current != null) {
-                    iv.removeRectangle();
-                }
-
-                if (destX != -1f && destY != -1f) {
-                    if (srcX == destX) {
-                        srcX = srcX - 5;
-                        destX = destX + 5;
-                    }
-
-                    if (srcY == destY) {
-                        srcY = srcY - 5;
-                        destY = destY + 5;
-                    }
-                    current = new RectF(srcX, srcY, destX, destY);
-                    destX = -1f;
-                    destY = -1f;
-                } else {
-                    current = new RectF(srcX - 5, srcY - 5, srcX + 5, srcY + 5);
-                }
-
-                srcX = -1f;
-                srcY = -1f;
-
-                Intent nextIntent = new Intent(this, KeySelectionActivity.class);
-                startActivityForResult(nextIntent, KEY_SELECTION);
-                break;
+    public void showLoginDialog(boolean force) {
+        // Create an instance of the dialog fragment and show it
+        userInfo.setLogin(settings.getString("login", null));
+        if (userInfo.getLogin() == null || force) {
+            loginDialog = new LoginDialog();
+            loginDialog.show(getFragmentManager(), "LoginDialog");
+        } else {
+            startPhoto();
         }
-
-        return true;
     }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        userInfo.setLogin(loginDialog.getLoginChosen());
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("login", userInfo.getLogin());
+        editor.commit();
+
+        startPhoto();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        System.exit(RESULT_CANCELED);
+    }
+
+
+    /*************/
+    /****PHOTO****/
+    /**
+     * *********
+     */
+
+    public void startPhoto() {
+        iv = (CustomImageView) findViewById(R.id.imageView);
+        iv.setLauncher(this);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, CAPTURE_IMAGE);
+    }
+
+
+    /*************/
+    /*****CLE*****/
+    /**
+     * *********
+     */
+
+    @Override
+    public void launch() {
+        Intent nextIntent = new Intent(this, KeySelectionActivity.class);
+        startActivityForResult(nextIntent, KEY_SELECTION);
+    }
+
+
+    /*************/
+    /*COMMENTAIRE*/
+    /*************/
 
     public void showComment(final boolean isKeySet) {
         String negButtonTitle = isKeySet ?
@@ -241,21 +236,5 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         });
 
         alert.show();
-    }
-
-    @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
-        userInfo.setLogin(loginDialog.getLoginChosen());
-
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("login", userInfo.getLogin());
-        editor.commit();
-
-        startPhoto();
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-        System.exit(RESULT_OK);
     }
 }
