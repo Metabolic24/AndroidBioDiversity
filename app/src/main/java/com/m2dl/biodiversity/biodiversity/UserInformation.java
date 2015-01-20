@@ -13,6 +13,8 @@ import java.io.File;
 public class UserInformation implements Parcelable{
     private String comment = "";
     private String login = "";
+    private String date = "";
+    private String key = "";
     private Location location = null;
     private Bitmap image;
     private File keyCharFile;
@@ -36,6 +38,22 @@ public class UserInformation implements Parcelable{
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public Location getLocation() {
@@ -79,6 +97,8 @@ public class UserInformation implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(login);
         dest.writeString(comment);
+        dest.writeString(date);
+        dest.writeString(key);
         dest.writeParcelable(image, flags);
         dest.writeParcelable(location, flags);
 

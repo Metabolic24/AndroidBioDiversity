@@ -24,7 +24,7 @@ public class KeySelectionActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_key_selection);
 
-        //userInfo = (UserInformation) getIntent().getSerializableExtra("USER_INFORMATION");
+        userInfo = (UserInformation) getIntent().getParcelableExtra("USER_INFORMATION");
 
         KeyXMLParser parser = new KeyXMLParser();
 

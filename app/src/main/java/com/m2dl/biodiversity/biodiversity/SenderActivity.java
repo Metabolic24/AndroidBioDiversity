@@ -33,5 +33,7 @@ public class SenderActivity extends ActionBarActivity {
             }
         });
 
+        UserInformation userInfo = (UserInformation) getIntent().getParcelableExtra("USER_INFORMATION");
+        MetaXMLWriter.saveXml(this.getCacheDir(), userInfo);
     }
 }

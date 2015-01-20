@@ -179,6 +179,7 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
     @Override
     public void launch() {
         Intent nextIntent = new Intent(this, KeySelectionActivity.class);
+        nextIntent.putExtra("USER_INFORMATION", userInfo);
         startActivityForResult(nextIntent, KEY_SELECTION);
     }
 
@@ -212,6 +213,7 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
         alert.setView(input);
 
         final Intent nextIntent = new Intent(this, SenderActivity.class);
+        nextIntent.putExtra("USER_INFORMATION", userInfo);
 
         alert.setPositiveButton(posButtonTitle, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
