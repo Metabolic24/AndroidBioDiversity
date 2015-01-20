@@ -6,7 +6,6 @@ import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,28 +17,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/*Activité Principale de l'Application*/
-
-public class MainActivity extends ActionBarActivity implements CustomImageView.KeyLauncher, LoginDialog.NoticeDialogListener {
+/**
+ * Activité Principale de l'Application
+ */
+public class MainActivity extends ActionBarActivity implements CustomImageView.KeyLauncher, LoginDialog.LoginDialogListener {
 
     private static final int CAPTURE_IMAGE = 5654;
     private static final int KEY_SELECTION = 303;
 
     private CustomImageView iv;
-<<<<<<< HEAD
-    private RectF current = null;
-    private float srcX, srcY, destX, destY = -1f;
-=======
-    private Bitmap bitmap = null;
->>>>>>> 88f0cfb72b48aa9e68b9fbfacc39a8bed279bce6
-
-    private UserInformation userInfo;
-
     private SharedPreferences settings;
     private LoginDialog loginDialog;
 
-    //Constructeur
+    private UserInformation userInfo;
 
+    /**
+     * Constructeur
+     */
     public MainActivity() {
         super();
         userInfo = new UserInformation();
@@ -132,13 +126,12 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
         return super.onOptionsItemSelected(item);
     }
 
-
     /*************/
     /****LOGIN****/
     /**
-     * *********
+     * Show the login dialog
+     * @param force force the login set
      */
-
     public void showLoginDialog(boolean force) {
         // Create an instance of the dialog fragment and show it
         userInfo.setLogin(settings.getString("login", null));
@@ -151,7 +144,7 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
+    public void onConnectClick(DialogFragment dialog) {
         userInfo.setLogin(loginDialog.getLoginChosen());
 
         SharedPreferences.Editor editor = settings.edit();
@@ -162,7 +155,7 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
     }
 
     @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
+    public void onCancelClick(DialogFragment dialog) {
         System.exit(RESULT_CANCELED);
     }
 
@@ -170,9 +163,8 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
     /*************/
     /****PHOTO****/
     /**
-     * *********
+     * Start the photo mode
      */
-
     public void startPhoto() {
         iv = (CustomImageView) findViewById(R.id.imageView);
         iv.setLauncher(this);
@@ -183,9 +175,6 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
 
     /*************/
     /*****CLE*****/
-    /**
-     * *********
-     */
 
     @Override
     public void launch() {
@@ -196,8 +185,10 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
 
     /*************/
     /*COMMENTAIRE*/
-    /*************/
-
+    /**
+     * Show the comment dialog
+     * @param isKeySet true if the key, false otherwise
+     */
     public void showComment(final boolean isKeySet) {
         String negButtonTitle = isKeySet ?
                 getString(R.string.action_pass) :
