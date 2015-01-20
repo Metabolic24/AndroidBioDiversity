@@ -17,6 +17,8 @@ public class SenderActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sender_layout);
         Button btnSendTo = (Button) findViewById(R.id.btnSendTo);
+        final UserInformation userInfo = (UserInformation) getIntent().getParcelableExtra("USER_INFORMATION");
+        userInfo.loadImageFromDir(getCacheDir());
         btnSendTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -24,7 +26,7 @@ public class SenderActivity extends ActionBarActivity {
                     @Override
                     public void run() {
                         EditText txtSendTo = (EditText) findViewById(R.id.txtSendTo);
-                        ISender mailSender = new MailSender();
+                        ISender mailSender = new MailSender(userInfo);
                         mailSender.sendData(txtSendTo.getText().toString());
                     }
                 });
@@ -33,7 +35,6 @@ public class SenderActivity extends ActionBarActivity {
             }
         });
 
-        UserInformation userInfo = (UserInformation) getIntent().getParcelableExtra("USER_INFORMATION");
         MetaXMLWriter.saveXml(this.getCacheDir(), userInfo);
     }
 }
