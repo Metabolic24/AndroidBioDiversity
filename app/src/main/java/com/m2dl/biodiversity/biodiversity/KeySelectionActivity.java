@@ -17,10 +17,14 @@ import java.util.List;
 
 public class KeySelectionActivity extends Activity {
 
+    private UserInformation userInfo = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_key_selection);
+
+        //userInfo = (UserInformation) getIntent().getSerializableExtra("USER_INFORMATION");
 
         KeyXMLParser parser = new KeyXMLParser();
 
@@ -65,7 +69,8 @@ public class KeySelectionActivity extends Activity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO Ajouter la mémorisation du choix (si besoin)
+                Spinner sItems = (Spinner) findViewById(R.id.spinner2);
+                userInfo.setKey(sItems.getSelectedItem().toString());
                 stop(RESULT_OK);
             }
         });
@@ -96,10 +101,6 @@ public class KeySelectionActivity extends Activity {
 
 
     public void initSpinner2(List<String> soustypes) {
-        /*List<String> spinnerArray =  new ArrayList<String>();
-        spinnerArray.add("test");
-        spinnerArray.add("blabla");*/
-
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, soustypes);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

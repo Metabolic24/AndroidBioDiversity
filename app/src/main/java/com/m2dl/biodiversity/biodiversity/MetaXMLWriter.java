@@ -19,7 +19,7 @@ import java.io.StringWriter;
  */
 public class MetaXMLWriter {
 
-    public static void saveXml(File outputDir){
+    public static void saveXml(File outputDir, UserInformation userInfo){
         try {
             File outputFile = File.createTempFile("meta", "xml", outputDir);
 
@@ -33,28 +33,32 @@ public class MetaXMLWriter {
             serializer.startTag("", "photo");
 
             serializer.startTag("", "coord");
-            serializer.startTag("", "alti");
-            serializer.text("0.000");
-            serializer.endTag("", "alti");
+            serializer.startTag("", "lati");
+            if(userInfo.getLocation() != null){
+                serializer.text(String.valueOf(userInfo.getLocation().getLatitude()));
+            }
+            serializer.endTag("", "lati");
             serializer.startTag("", "longi");
-            serializer.text("0.000");
+            if(userInfo.getLocation() != null){
+                serializer.text(String.valueOf(userInfo.getLocation().getLongitude()));
+            }
             serializer.endTag("", "longi");
             serializer.endTag("", "coord");
             serializer.startTag("", "date");
-            serializer.text("une date");
+            serializer.text(userInfo.getDate());
             serializer.endTag("", "date");
             serializer.startTag("", "user");
-            serializer.text("mon nom");
+            serializer.text(userInfo.getLogin());
             serializer.endTag("", "user");
             serializer.startTag("", "com");
-            serializer.text("com");
+            serializer.text(userInfo.getComment());
             serializer.endTag("", "com");
             serializer.startTag("", "point");
             serializer.startTag("", "cle");
-            serializer.text("cle...");
+            serializer.text(userInfo.getKey());
             serializer.endTag("", "cle");
             serializer.startTag("", "zone");
-            serializer.text("x1 x2 x3 x4");
+            serializer.text("coords zone...");
             serializer.endTag("", "zone");
             serializer.endTag("", "point");
 
@@ -67,6 +71,7 @@ public class MetaXMLWriter {
             fileos.write(dataWrite.getBytes());
             fileos.close();
 
+            Log.i("MetaXMLWriter", "Finish");
         }
         catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
