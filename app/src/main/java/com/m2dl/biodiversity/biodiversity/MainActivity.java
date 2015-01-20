@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.RectF;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -16,64 +14,49 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/*Activité Principale de l'Application*/
 
-public class MainActivity extends ActionBarActivity implements View.OnTouchListener, LoginDialog.NoticeDialogListener {
+public class MainActivity extends ActionBarActivity implements CustomImageView.KeyLauncher, LoginDialog.NoticeDialogListener {
 
     private static final int CAPTURE_IMAGE = 5654;
     private static final int KEY_SELECTION = 303;
 
     private CustomImageView iv;
-    private RectF current = null;
-    private String comment = "";
     private Bitmap bitmap = null;
-    private String login = "";
-    private Location location;
+
+    private UserInformation userInfo;
 
     private SharedPreferences settings;
-
     private LoginDialog loginDialog;
 
-    private float srcX, srcY, destX, destY = -1f;
+    //Constructeur
+
+    public MainActivity() {
+        super();
+        userInfo = new UserInformation();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         settings = getSharedPreferences("PREFS_BIODIVERSITY",0);
 
-        showLoginDialog();
+        showLoginDialog(false);
     }
 
-    public void showLoginDialog() {
-        // Create an instance of the dialog fragment and show it
-        login = settings.getString("login", null);
-        if(login == null) {
-            loginDialog = new LoginDialog();
-            loginDialog.show(getFragmentManager(), "LoginDialog");
-        }
-        else {
-            startPhoto();
-        }
-    }
-
-    public void startPhoto() {
-        iv = (CustomImageView) findViewById(R.id.imageView);
-        iv.setOnTouchListener(this);
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, CAPTURE_IMAGE);
-    }
+    /* Effectue un traitement après la fin d'une activité : */
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            //Si l'activité était une prise de photo
+            //Photo
             case CAPTURE_IMAGE:
                 if (resultCode == RESULT_OK) {
                     /*Uri selectedImage = imageUri;
@@ -92,29 +75,32 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
                     LocationManager lm = (LocationManager) this.getSystemService(LOCATION_SERVICE);
                     if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        userInfo.setLocation(lm.getLastKnownLocation(LocationManager.GPS_PROVIDER));
                     }
                     else {
-                        location = null;
+                        userInfo.setLocation(null);
                     }
-                    //DEBUG
-                    if(location != null)
-                    {
-                        Log.i("Location", location.toString());
-                    }
+                } else {
+                    System.exit(RESULT_CANCELED);
                 }
                 break;
+            //Clé de détermination
             case KEY_SELECTION:
+                iv.finalize(resultCode == RESULT_OK);
                 if (resultCode == RESULT_OK) {
-                    iv.addRectangle(current, true);
-                    iv.invalidate();
                     showComment(true);
                 }
-                current = null;
                 break;
         }
 
     }
+
+
+    /************/
+    /****MENU****/
+    /**
+     * ********
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -131,70 +117,81 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
             showComment(false);
             return true;
         }
+        else {
+            if(id == R.id.change_login) {
+                showLoginDialog(true);
+                return true;
+            }
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_CANCEL:
-                srcX = -1f;
-                srcY = -1f;
-                destX = -1f;
-                destY = -1f;
-                current = null;
-                break;
-            case MotionEvent.ACTION_DOWN:
-                srcX = event.getX();
-                srcY = event.getY();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (srcX != -1f && srcY != -1f) {
-                    if (current != null) {
-                        iv.removeRectangle();
-                    }
 
-                    destX = event.getX();
-                    destY = event.getY();
-                    current = new RectF(srcX, srcY, destX, destY);
+    /*************/
+    /****LOGIN****/
+    /**
+     * *********
+     */
 
-                    iv.addRectangle(current, false);
-                    iv.invalidate();
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if (current != null) {
-                    iv.removeRectangle();
-                }
-
-                if (destX != -1f && destY != -1f) {
-                    if (srcX == destX) {
-                        srcX = srcX - 5;
-                        destX = destX + 5;
-                    }
-
-                    if (srcY == destY) {
-                        srcY = srcY - 5;
-                        destY = destY + 5;
-                    }
-                    current = new RectF(srcX, srcY, destX, destY);
-                    destX = -1f;
-                    destY = -1f;
-                } else {
-                    current = new RectF(srcX - 5, srcY - 5, srcX + 5, srcY + 5);
-                }
-
-                srcX = -1f;
-                srcY = -1f;
-
-                Intent nextIntent = new Intent(this, KeySelectionActivity.class);
-                startActivityForResult(nextIntent, KEY_SELECTION);
-                break;
+    public void showLoginDialog(boolean force) {
+        // Create an instance of the dialog fragment and show it
+        userInfo.setLogin(settings.getString("login", null));
+        if (userInfo.getLogin() == null || force) {
+            loginDialog = new LoginDialog();
+            loginDialog.show(getFragmentManager(), "LoginDialog");
+        } else {
+            startPhoto();
         }
-
-        return true;
     }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        userInfo.setLogin(loginDialog.getLoginChosen());
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("login", userInfo.getLogin());
+        editor.commit();
+
+        startPhoto();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        System.exit(RESULT_CANCELED);
+    }
+
+
+    /*************/
+    /****PHOTO****/
+    /**
+     * *********
+     */
+
+    public void startPhoto() {
+        iv = (CustomImageView) findViewById(R.id.imageView);
+        iv.setLauncher(this);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, CAPTURE_IMAGE);
+    }
+
+
+    /*************/
+    /*****CLE*****/
+    /**
+     * *********
+     */
+
+    @Override
+    public void launch() {
+        Intent nextIntent = new Intent(this, KeySelectionActivity.class);
+        startActivityForResult(nextIntent, KEY_SELECTION);
+    }
+
+
+    /*************/
+    /*COMMENTAIRE*/
+    /*************/
 
     public void showComment(final boolean isKeySet) {
         String negButtonTitle = isKeySet ?
@@ -212,8 +209,8 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
         // Set an EditText view to get user input
         final EditText input = new EditText(this);
-        if (!comment.isEmpty()) {
-            input.setText(comment, TextView.BufferType.EDITABLE);
+        if (!userInfo.getComment().isEmpty()) {
+            input.setText(userInfo.getComment(), TextView.BufferType.EDITABLE);
         }
 
         alert.setView(input);
@@ -222,7 +219,7 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
         alert.setPositiveButton(posButtonTitle, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                comment = input.getText().toString();
+                userInfo.setComment(input.getText().toString());
 
                 if (isKeySet) {
                     startActivity(nextIntent);
@@ -239,21 +236,5 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
         });
 
         alert.show();
-    }
-
-    @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
-        login = loginDialog.getLoginChosen();
-
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("login", login);
-        editor.commit();
-
-        startPhoto();
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-        System.exit(RESULT_OK);
     }
 }

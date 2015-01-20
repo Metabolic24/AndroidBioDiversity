@@ -7,21 +7,27 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
 
 
-public class CustomImageView extends ImageView {
+public class CustomImageView extends ImageView implements View.OnTouchListener {
 
     private ArrayList<RectF> rectList;
-    private RectF current;
+    private RectF current = null;
     private Paint finalPaint, drawingPaint;
+    private float srcX, srcY, destX, destY = -1f;
+    private KeyLauncher launcher;
 
     public CustomImageView(Context context) {
         super(context);
         init();
     }
+
+    //Constructeurs
 
     public CustomImageView(Context context, AttributeSet attr) {
         super(context, attr);
@@ -35,6 +41,9 @@ public class CustomImageView extends ImageView {
 
     private void init() {
         rectList = new ArrayList<>();
+
+        setOnTouchListener(this);
+
         finalPaint = new Paint();
         finalPaint.setColor(Color.RED);
         finalPaint.setStyle(Paint.Style.STROKE);
@@ -42,19 +51,38 @@ public class CustomImageView extends ImageView {
 
         drawingPaint = new Paint();
         //drawingPaint.setColor(Color.GRAY); //Commenté si un seul élément
-        drawingPaint.setColor(Color.RED);
+        drawingPaint.setColor(Color.RED);    //Commenté si plusieurs éléments
         drawingPaint.setStyle(Paint.Style.STROKE);
         drawingPaint.setStrokeWidth(3);
     }
 
-    public void addRectangle(RectF rectangle, boolean isFinal) {
-        rectList.add(rectangle);
-        if (isFinal) {
-            current = null;
-        } else {
-            current = rectangle;
-        }
+    /*Méthode d'initialisation*/
+
+    /**
+     * *********
+     */
+
+    public void setLauncher(KeyLauncher launcher) {
+        this.launcher = launcher;
     }
+
+
+    /*************/
+    /***LAUNCHER**/
+
+    /**
+     * *********
+     */
+
+    public void addRectangle(RectF rectangle) {
+        rectList.add(rectangle);
+        current = rectangle;
+    }
+
+    /*************/
+    /**
+     * RECTANGLE*
+     */
 
     public void removeRectangle() {
         if (current != null) {
@@ -62,6 +90,16 @@ public class CustomImageView extends ImageView {
             current = null;
         }
     }
+
+    public void finalize(boolean isOK) {
+        if (isOK && current != null) {
+            rectList.add(current);
+            invalidate();
+        }
+        current = null;
+    }
+
+    /*************/
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
@@ -73,5 +111,78 @@ public class CustomImageView extends ImageView {
                 canvas.drawRect(currentRect, finalPaint);
             }
         }
+    }
+
+    /*************/
+    /****DESSIN***/
+
+    /**
+     * *********
+     */
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_CANCEL:
+                srcX = -1f;
+                srcY = -1f;
+                destX = -1f;
+                destY = -1f;
+                current = null;
+                break;
+            case MotionEvent.ACTION_DOWN:
+                srcX = event.getX();
+                srcY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (srcX != -1f && srcY != -1f) {
+                    removeRectangle();
+
+                    destX = event.getX();
+                    destY = event.getY();
+                    current = new RectF(srcX, srcY, destX, destY);
+
+                    addRectangle(current);
+                    invalidate();
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                removeRectangle();
+
+                if (destX != -1f && destY != -1f) {
+                    if (srcX == destX) {
+                        srcX = srcX - 5;
+                        destX = destX + 5;
+                    }
+
+                    if (srcY == destY) {
+                        srcY = srcY - 5;
+                        destY = destY + 5;
+                    }
+                    current = new RectF(srcX, srcY, destX, destY);
+                    destX = -1f;
+                    destY = -1f;
+                } else {
+                    current = new RectF(srcX - 5, srcY - 5, srcX + 5, srcY + 5);
+                }
+
+                srcX = -1f;
+                srcY = -1f;
+
+                launcher.launch();
+
+                break;
+        }
+
+        return true;
+    }
+
+
+    /*************/
+    /**
+     * TACTILE**
+     */
+    public interface KeyLauncher {
+        public void launch();
     }
 }
