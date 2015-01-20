@@ -29,7 +29,6 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
 
     private CustomImageView iv;
     private RectF current = null;
-    private Bitmap bitmap = null;
     private float srcX, srcY, destX, destY = -1f;
 
     private UserInformation userInfo;
@@ -81,9 +80,9 @@ public class MainActivity extends ActionBarActivity implements View.OnTouchListe
                     getContentResolver().notifyChange(selectedImage, null);*/
                     ContentResolver cr = getContentResolver();
                     try {
-                        bitmap = android.provider.MediaStore.Images.Media
-                                .getBitmap(cr, data.getData());
-                        iv.setImageBitmap(bitmap);
+                        userInfo.setImage(android.provider.MediaStore.Images.Media
+                                .getBitmap(cr, data.getData()));
+                        iv.setImageBitmap(userInfo.getImage());
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT)
