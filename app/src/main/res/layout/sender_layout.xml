@@ -7,7 +7,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send all to:"
-        android:id="@+id/lblSendTo" />
+        android:id="@+id/lblSendTo"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
         android:layout_width="match_parent"
@@ -15,6 +16,18 @@
         android:inputType="textEmailAddress"
         android:ems="10"
         android:id="@+id/txtSendTo" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preview:"
+        android:id="@+id/lblPreview"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView2" />
 
     <Button
         android:layout_width="wrap_content"
