@@ -44,7 +44,7 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        settings = getSharedPreferences("PREFS_BIODIVERSITY",0);
+        settings = getSharedPreferences("PREFS_BIODIVERSITY", 0);
 
         showLoginDialog(false);
     }
@@ -75,8 +75,7 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
                     LocationManager lm = (LocationManager) this.getSystemService(LOCATION_SERVICE);
                     if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                         userInfo.setLocation(lm.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-                    }
-                    else {
+                    } else {
                         userInfo.setLocation(null);
                     }
                 } else {
@@ -111,34 +110,40 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.editer_commentaire) {
-            showComment(false);
-            return true;
-        }
-        else {
-            if(id == R.id.change_login) {
+        switch (id) {
+            case R.id.editer_commentaire:
+                showComment(false);
+                return true;
+            case R.id.change_login:
                 showLoginDialog(true);
                 return true;
-            }
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /*************/
     /****LOGIN****/
+    /*************/
+
     /**
      * Show the login dialog
-     * @param force force the login set
+     *
+     * @param fromMenu called from the Menu
      */
-    public void showLoginDialog(boolean force) {
+    public void showLoginDialog(boolean fromMenu) {
         // Create an instance of the dialog fragment and show it
         userInfo.setLogin(settings.getString("login", null));
-        if (userInfo.getLogin() == null || force) {
+
+        //Si le login n'est pas déjà spécifié
+        //Ou que l'appel a été déclenché par le menu
+        if (userInfo.getLogin() == null || fromMenu) {
             loginDialog = new LoginDialog();
+            loginDialog.setFromMenu(fromMenu);
             loginDialog.show(getFragmentManager(), "LoginDialog");
-        } else {
+        }
+        //Sinon on déclenche directement l'activité de prise de photo
+        else {
             startPhoto();
         }
     }
@@ -151,20 +156,25 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
         editor.putString("login", userInfo.getLogin());
         editor.commit();
 
-        startPhoto();
+        if (!loginDialog.isFromMenu()) {
+            startPhoto();
+        }
     }
 
     @Override
     public void onCancelClick(DialogFragment dialog) {
-        System.exit(RESULT_CANCELED);
+        if (!loginDialog.isFromMenu()) {
+            System.exit(RESULT_CANCELED);
+        }
     }
 
 
     /*************/
     /****PHOTO****/
     /**
-     * Start the photo mode
+     * *********
      */
+
     public void startPhoto() {
         iv = (CustomImageView) findViewById(R.id.imageView);
         iv.setLauncher(this);
@@ -175,11 +185,13 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
 
     /*************/
     /*****CLE*****/
+    /**
+     * *********
+     */
 
     @Override
     public void launch() {
         Intent nextIntent = new Intent(this, KeySelectionActivity.class);
-        userInfo.saveImageToDir(getCacheDir());
         nextIntent.putExtra("USER_INFORMATION", userInfo);
         startActivityForResult(nextIntent, KEY_SELECTION);
     }
@@ -187,11 +199,16 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
 
     /*************/
     /*COMMENTAIRE*/
+    /*************/
+
     /**
      * Show the comment dialog
-     * @param isKeySet true if the key, false otherwise
+     *
+     * @param isKeySet true if the key is already set, false otherwise
      */
     public void showComment(final boolean isKeySet) {
+
+        //Initialisation des titres des boutons selon le cas
         String negButtonTitle = isKeySet ?
                 getString(R.string.action_pass) :
                 getString(R.string.action_cancel);
@@ -200,28 +217,37 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
                 getString(R.string.action_next) :
                 getString(R.string.action_ok);
 
+        //Création de la Dialog
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle("Commentaire");
         alert.setMessage("Editer le commentaire");
 
-        // Set an EditText view to get user input
+        // Création d'une zone d'édition de texte
         final EditText input = new EditText(this);
+
         if (!userInfo.getComment().isEmpty()) {
             input.setText(userInfo.getComment(), TextView.BufferType.EDITABLE);
         }
 
         alert.setView(input);
 
+        if (isKeySet) {
+            alert.setCancelable(false);
+        }
+
+        //Préparation de l'intent pour le lancement de la prochaine activité
         final Intent nextIntent = new Intent(this, SenderActivity.class);
-        userInfo.saveImageToDir(getCacheDir());
         nextIntent.putExtra("USER_INFORMATION", userInfo);
 
+
+        //Définition du comportement des boutons de la Dialog
         alert.setPositiveButton(posButtonTitle, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 userInfo.setComment(input.getText().toString());
 
                 if (isKeySet) {
+                    userInfo.saveImageToDir(getCacheDir());
                     startActivity(nextIntent);
                 }
             }
@@ -230,6 +256,7 @@ public class MainActivity extends ActionBarActivity implements CustomImageView.K
         alert.setNegativeButton(negButtonTitle, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 if (isKeySet) {
+                    userInfo.saveImageToDir(getCacheDir());
                     startActivity(nextIntent);
                 }
             }

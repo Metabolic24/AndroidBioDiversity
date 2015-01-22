@@ -1,16 +1,17 @@
 package com.m2dl.biodiversity.biodiversity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.m2dl.biodiversity.biodiversity.sender.ISender;
 import com.m2dl.biodiversity.biodiversity.sender.mail.MailSender;
 
-public class SenderActivity extends ActionBarActivity {
+public class SenderActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +20,7 @@ public class SenderActivity extends ActionBarActivity {
         Button btnSendTo = (Button) findViewById(R.id.btnSendTo);
         final UserInformation userInfo = (UserInformation) getIntent().getParcelableExtra("USER_INFORMATION");
         userInfo.loadImageFromDir(getCacheDir());
+        ((ImageView) findViewById(R.id.imageView2)).setImageBitmap(userInfo.getImage());
         btnSendTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

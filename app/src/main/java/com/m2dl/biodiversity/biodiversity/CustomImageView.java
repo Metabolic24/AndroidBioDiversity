@@ -94,12 +94,16 @@ public class CustomImageView extends ImageView implements View.OnTouchListener {
     public void finalize(boolean isOK) {
         if (isOK && current != null) {
             rectList.add(current);
-            invalidate();
         }
         current = null;
+        invalidate();
     }
 
     /*************/
+    /****DESSIN***/
+    /**
+     * *********
+     */
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
@@ -113,9 +117,9 @@ public class CustomImageView extends ImageView implements View.OnTouchListener {
         }
     }
 
-    /*************/
-    /****DESSIN***/
 
+    /*************/
+    /***TACTILE***/
     /**
      * *********
      */
@@ -178,10 +182,8 @@ public class CustomImageView extends ImageView implements View.OnTouchListener {
     }
 
 
-    /*************/
-    /**
-     * TACTILE**
-     */
+    /*Interface pour le lancement de l'activité suivante*/
+
     public interface KeyLauncher {
         public void launch();
     }

@@ -18,13 +18,28 @@ public class LoginDialog extends DialogFragment {
     // Use this instance of the interface to deliver action events
     private LoginDialogListener mListener;
     private String loginChosen;
+    private boolean fromMenu;
 
-    // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
+    public LoginDialog() {
+        super();
+    }
+
+    //Permet de savoir si cette Dialog a été appelée depuis le menu
+    public boolean isFromMenu() {
+        return fromMenu;
+    }
+
+    //Permet de définir si l'origine de l'action est le menu
+    public void setFromMenu(boolean fromMenu) {
+        this.fromMenu = fromMenu;
+    }
+
+    // Override the Fragment.onAttach() method to instantiate the LoginDialogListener
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         loginChosen = null;
-        try { //Verify the activity implements NoticeDialogListener
+        try { //Verify the activity implements LoginDialogListener
             mListener = (LoginDialogListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement NoticeDialogListener");
@@ -36,10 +51,18 @@ public class LoginDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         //Get the layout inflater, pass null as parent view because it's going in the dialog layout
         View content = getActivity().getLayoutInflater().inflate(R.layout.login_dialog, null);
+
         final EditText txtLogin = (EditText) content.findViewById(R.id.txtLogin);
         // Inflate and set the layout for the dialog
         setStyle(STYLE_NORMAL, getTheme());
-        setCancelable(false);
+
+        if (!fromMenu) {
+            setCancelable(false);
+        }
+
+
+        String quit_Title = fromMenu ? getString(R.string.action_cancel) : getString(R.string.action_quit);
+
         builder.setView(content)
                 // Add action buttons
                 .setPositiveButton(getString(R.string.action_login), new DialogInterface.OnClickListener() {
@@ -53,7 +76,7 @@ public class LoginDialog extends DialogFragment {
                         }
                     }
                 })
-                .setNegativeButton(getString(R.string.action_quit), new DialogInterface.OnClickListener() {
+                .setNegativeButton(quit_Title, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mListener.onCancelClick(LoginDialog.this);
                     }
@@ -71,12 +94,14 @@ public class LoginDialog extends DialogFragment {
     public interface LoginDialogListener {
         /**
          * If the connect button was chosen by the user
+         *
          * @param dialog the dialog
          */
         public void onConnectClick(DialogFragment dialog);
 
         /**
          * If the cancel button was chosen by the user
+         *
          * @param dialog the dialog
          */
         public void onCancelClick(DialogFragment dialog);
